@@ -89,8 +89,8 @@ class UpdateChecker
     # EMAIL
     def email_me
 		Pony.mail({
-		  :to => ['adamhowardprice@gmail.com', 'adamprice@spotify.com'],
-		  :from => 'WWDC 2013 Alert! <wwdc2013alert@gmail.com>',
+		  :to => ["#{ENV['SENDGRID_TO_EMAIL_1']}", "#{ENV['SENDGRID_TO_EMAIL_2']}"],
+		  :from => "WWDC 2013 Alert! <#{ENV['SENDGRID_FROM_EMAIL']}>",
 		  :subject => "#{MESSAGE_SUBJECT}",
 		  :body => "#{MESSAGE_BODY}",
 		  :via => :smtp,
@@ -111,12 +111,12 @@ class UpdateChecker
     ##################################################
     # TEXT
     def text_me
-		account_sid = 'AC7aa58730695bda08042276d28e4621aa'
-		auth_token = '0cf8597186de73c5421d6a214d73f450'
+		account_sid = ENV['TWILIO_ACCOUNT_SID']
+		auth_token = ENV['TWILIO_AUTH_TOKEN']
 
 		client = Twilio::REST::Client.new(account_sid, auth_token)
 		account = client.account
-		message = account.sms.messages.create({:from => '+19177467795', :to => '+14052052965', 
+		message = account.sms.messages.create({:from => ENV['TWILIO_TRIAL_NUMBER'], :to => ENV['TWILIO_TO_NUMBER'], 
 			:body => MESSAGE_BODY})
     end
 end
