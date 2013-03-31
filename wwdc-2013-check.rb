@@ -97,7 +97,7 @@ class UpdateChecker
 		  :via_options => {
 		    :address              => 'smtp.sendgrid.com',
 		    :port                 => '587',
-		    :enable_starttls_auto => true,
+		    :enable_starttls_auto => false,
 		    :domain               => "heroku.com",
 		    :user_name            => ENV['SENDGRID_USERNAME'],
 		    :password             => ENV['SENDGRID_PASSWORD'],
