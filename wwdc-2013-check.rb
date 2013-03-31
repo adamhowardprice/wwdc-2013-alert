@@ -3,11 +3,12 @@
 
 require 'rubygems'
 require 'twilio-ruby'
+require 'pony'
 require 'net/https'
 require 'uri'
 
 # Constants
-SHOULD_NOTIFY = false
+SHOULD_NOTIFY = true
 MESSAGE_SUBJECT = "WWDC 2013 ALERT UPDATE"
 MESSAGE_BODY = "SITE HAS UPDATED! Go see: https://developer.apple.com/wwdc/"
 
@@ -70,14 +71,14 @@ class UpdateChecker
 	# "WWDC 2012. June 11-15 in San Francisco. It's the week we've all been waiting for."
     def is_site_updated? site_string
 		$last_year_string = "WWDC 2012. June 11-15 in San Francisco. It\'s the week we\'ve all been waiting for."
-		return !( site_string.include? $last_year_string )
+		return ( site_string.include? $last_year_string )
     end
 
     ##################################################
     # Step 3: If the site no longer includes the phrase, notify me!
     def notify_me
     	if SHOULD_NOTIFY
-			#email_me
+			email_me
     		text_me
     	else
     		puts MESSAGE_BODY
@@ -87,26 +88,24 @@ class UpdateChecker
     ##################################################
     # EMAIL
     def email_me
-		Net::SMTP.enable_tls(OpenSSL::SSL::VERIFY_PEER)
-		smtp_addr = "smtp.gmail.com"
-		domain = "gmail.com"
-		sender = "wwdc2013alert@gmail.com"
-		password = "notmacworld"
-		recipients = ["adamhowardprice@gmail.com", "adamprice@spotify.com"]
-    	message = <<-END_OF_MESSAGE
-From: WWDC 2013 Alert <#{sender}>
-To: Adam Price <#{recipients.join(', ')}>
-Subject: #{MESSAGE_SUBJECT}
+		Pony.mail({
+		  :to => ['adamhowardprice@gmail.com', 'adamprice@spotify.com'],
+		  :from => 'WWDC 2013 Alert! <wwdc2013alert@gmail.com>',
+		  :subject => "#{MESSAGE_SUBJECT}",
+		  :body => "#{MESSAGE_BODY}",
+		  :via => :smtp,
+		  :via_options => {
+		    :address              => 'smtp.sendgrid.com',
+		    :port                 => '587',
+		    :enable_starttls_auto => true,
+		    :domain               => "heroku.com",
+		    :user_name            => ENV['SENDGRID_USERNAME'],
+		    :password             => ENV['SENDGRID_PASSWORD'],
+		    :authentication       => :plain # :plain, :login, :cram_md5, no auth by default
+		  }
+		})
 
-#{MESSAGE_BODY}
-END_OF_MESSAGE
-		 
-		# smtp.enable_starttls
-		Net::SMTP.start(smtp_addr, 587, domain, sender, password, :login) do |smtp|
-		    smtp.send_message message, sender, recipients
-		end
-
-		puts "Emailed: " + message
+		puts "Emailed: " + MESSAGE_BODY
     end
 
     ##################################################
