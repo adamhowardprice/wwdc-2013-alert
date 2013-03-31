@@ -71,7 +71,7 @@ class UpdateChecker
 	# "WWDC 2012. June 11-15 in San Francisco. It's the week we've all been waiting for."
     def is_site_updated? site_string
 		$last_year_string = "WWDC 2012. June 11-15 in San Francisco. It\'s the week we\'ve all been waiting for."
-		return ( site_string.include? $last_year_string )
+		return !( site_string.include? $last_year_string )
     end
 
     ##################################################
