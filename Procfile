@@ -1,1 +1,1 @@
-web: bundle exec ruby wwdc-2013-check.rb
+web: bundle exec ruby lib/wwdc-2013-check.rb
