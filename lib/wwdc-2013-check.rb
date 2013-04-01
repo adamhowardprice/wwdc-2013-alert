@@ -9,8 +9,11 @@ require 'uri'
 
 # Constants
 SHOULD_NOTIFY = true
-MESSAGE_SUBJECT = "WWDC 2013 ALERT UPDATE"
-MESSAGE_BODY = "SITE HAS UPDATED! Go see: https://developer.apple.com/wwdc/"
+IS_TEST = false
+MESSAGE_SUBJECT = IS_TEST ? 'WWDC 2013 TEST NOTIFICATION' : 'WWDC 2013 ALERT UPDATE'
+MESSAGE_BODY = IS_TEST ? 'THIS IS ONLY A TEST' : 'SITE HAS UPDATED! Go see: https://developer.apple.com/wwdc/'
+EMAILS_TO_NOTIFY = [ENV['SENDGRID_TO_EMAIL_1'], ENV['SENDGRID_TO_EMAIL_2'], ENV['SENDGRID_TO_EMAIL_3'], ENV['SENDGRID_TO_EMAIL_4']]
+NUMBERS_TO_NOTIFY = [ENV['TWILIO_TO_NUMBER'], ENV['TWILIO_TO_NUMBER2'], ENV['TWILIO_TO_NUMBER3']]
 
 class UpdateChecker
 	# Actions
@@ -78,8 +81,8 @@ class UpdateChecker
     # Step 3: If the site no longer includes the phrase, notify me!
     def notify_me
     	if SHOULD_NOTIFY
-			email_me
-    		text_me
+			email_people
+    		text_people
     	else
     		puts MESSAGE_BODY
     	end
@@ -87,9 +90,9 @@ class UpdateChecker
 
     ##################################################
     # EMAIL
-    def email_me
+    def email_people
 		Pony.mail({
-		  :to => ["#{ENV['SENDGRID_TO_EMAIL_1']}", "#{ENV['SENDGRID_TO_EMAIL_2']}"],
+		  :to => EMAILS_TO_NOTIFY,
 		  :from => "WWDC 2013 Alert! <#{ENV['SENDGRID_FROM_EMAIL']}>",
 		  :subject => "#{MESSAGE_SUBJECT}",
 		  :body => "#{MESSAGE_BODY}",
@@ -110,14 +113,15 @@ class UpdateChecker
 
     ##################################################
     # TEXT
-    def text_me
-		account_sid = ENV['TWILIO_ACCOUNT_SID']
+    def text_people
+    	account_sid = ENV['TWILIO_ACCOUNT_SID']
 		auth_token = ENV['TWILIO_AUTH_TOKEN']
-
 		client = Twilio::REST::Client.new(account_sid, auth_token)
 		account = client.account
-		message = account.sms.messages.create({:from => ENV['TWILIO_TRIAL_NUMBER'], :to => ENV['TWILIO_TO_NUMBER'], 
-			:body => MESSAGE_BODY})
+
+    	NUMBERS_TO_NOTIFY.each do |number|
+			message = account.sms.messages.create({:from => ENV['TWILIO_TRIAL_NUMBER'], :to => number, :body => MESSAGE_BODY})
+    	end
     end
 end
 
