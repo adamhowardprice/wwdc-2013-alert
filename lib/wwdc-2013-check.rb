@@ -94,7 +94,7 @@ class UpdateChecker
     # EMAIL
     def email_people
 		Pony.mail({
-		  :to => EMAILS_TO_NOTIFY,
+		  :bcc => EMAILS_TO_NOTIFY,
 		  :from => "WWDC 2013 Alert! <#{ENV['SENDGRID_FROM_EMAIL']}>",
 		  :subject => "#{MESSAGE_SUBJECT}",
 		  :body => "#{MESSAGE_BODY}",
