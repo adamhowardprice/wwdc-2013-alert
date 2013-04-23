@@ -42,6 +42,8 @@ class UpdateChecker
     	abort("This is still the 2012 WWDC site") if !( is_site_updated? site_source )
     	
     	notify_me
+
+    	puts "THE SITE HAS CHANGED: #{site_source}"
     end	
 
 	##################################################
@@ -81,7 +83,7 @@ class UpdateChecker
     # Step 3: If the site no longer includes the phrase, notify me!
     def notify_me
     	if SHOULD_NOTIFY
-			email_people
+				email_people
     		text_people
     	else
     		puts MESSAGE_BODY
